@@ -1876,7 +1876,7 @@ usage (char *program)
     exit (1);
 }
 
-static void
+static Bool
 register_cm (void)
 {
     Window w;
@@ -1886,6 +1886,12 @@ register_cm (void)
     snprintf (net_wm_cm, sizeof (net_wm_cm), "_NET_WM_CM_S%d", scr);
     a = XInternAtom (dpy, net_wm_cm, False);
 
+    if (XGetSelectionOwner (dpy, a) != None)
+    {
+	fprintf (stderr, "Another composite manager is already running\n");
+	return False;
+    }
+
     w = XCreateSimpleWindow (dpy, RootWindow (dpy, scr), 0, 0, 1, 1, 0, None,
 			     None);
 
@@ -1893,6 +1899,8 @@ register_cm (void)
 			  NULL);
 
     XSetSelectionOwner (dpy, a, w, 0);
+
+    return True;
 }
 
 int
@@ -2016,7 +2024,10 @@ main (int argc, char **argv)
 	exit (1);
     }
 
-    register_cm();
+    if (!register_cm())
+    {
+	exit (1);
+    }
 
     /* get atoms */
     opacityAtom = XInternAtom (dpy, OPACITY_PROP, False);
