@@ -1881,15 +1881,16 @@ register_cm (void)
 {
     Window w;
     Atom a;
+    static char net_wm_cm[] = "_NET_WM_CM_Sxx";
 
-    w = XCreateSimpleWindow (dpy, RootWindow (dpy, 0), 0, 0, 1, 1, 0, None,
+    snprintf (net_wm_cm, sizeof (net_wm_cm), "_NET_WM_CM_S%d", scr);
+    a = XInternAtom (dpy, net_wm_cm, False);
+
+    w = XCreateSimpleWindow (dpy, RootWindow (dpy, scr), 0, 0, 1, 1, 0, None,
 			     None);
 
     Xutf8SetWMProperties (dpy, w, "xcompmgr", "xcompmgr", NULL, 0, NULL, NULL,
 			  NULL);
-
-    /* FIXME: Don't hard code the screen number */
-    a = XInternAtom (dpy, "_NET_WM_CM_S0", False);
 
     XSetSelectionOwner (dpy, a, w, 0);
 }
