@@ -1886,9 +1886,33 @@ register_cm (void)
     snprintf (net_wm_cm, sizeof (net_wm_cm), "_NET_WM_CM_S%d", scr);
     a = XInternAtom (dpy, net_wm_cm, False);
 
-    if (XGetSelectionOwner (dpy, a) != None)
+    w = XGetSelectionOwner (dpy, a);
+    if (w != None)
     {
-	fprintf (stderr, "Another composite manager is already running\n");
+	XTextProperty tp;
+	char **strs;
+	int count;
+	Atom winNameAtom = XInternAtom (dpy, "_NET_WM_NAME", False);
+      
+	if (!XGetTextProperty (dpy, w, &tp, winNameAtom) &&
+	    !XGetTextProperty (dpy, w, &tp, XA_WM_NAME))
+	{
+		fprintf (stderr,
+			 "Another composite manager is already running (0x%lx)\n",
+			 (unsigned long) w);
+		return False;
+	}
+	if (XmbTextPropertyToTextList (dpy, &tp, &strs, &count) == Success) 
+	{
+		fprintf (stderr, 
+			 "Another composite manager is already running (%s)\n",
+			 strs[0]);
+	  
+		XFreeStringList (strs);
+	}
+
+	XFree (tp.value);
+
 	return False;
     }
 
