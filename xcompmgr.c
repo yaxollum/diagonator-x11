@@ -1742,6 +1742,7 @@ error (Display *dpy, XErrorEvent *ev)
 {
     int	    o;
     const char    *name = NULL;
+    static char buffer[256];
     
     if (should_ignore (dpy, ev->serial))
 	return 0;
@@ -1772,9 +1773,17 @@ error (Display *dpy, XErrorEvent *ev)
     case BadGlyph: name ="BadGlyph"; break;
     default: break;
     }
-	
-    printf ("error %d request %d minor %d serial %lu\n",
-	    ev->error_code, ev->request_code, ev->minor_code, ev->serial);
+
+    if (name == NULL)
+    {
+	buffer[0] = '\0';
+	XGetErrorText (dpy, ev->error_code, buffer, sizeof (buffer));
+	name = buffer;
+    }
+
+    fprintf (stderr, "error %d: %s request %d minor %d serial %lu\n",
+	     ev->error_code, (strlen (name) > 0) ? name : "unknown",
+	     ev->request_code, ev->minor_code, ev->serial);
 
 /*    abort ();	    this is just annoying to most people */
     return 0;
