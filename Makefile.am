@@ -1,7 +1,7 @@
 bin_PROGRAMS = xcompmgr
 man_MANS = xcompmgr.1
 
-AM_CFLAGS = $(XCOMPMGR_CFLAGS)
+AM_CFLAGS = $(CWARNFLAGS) $(XCOMPMGR_CFLAGS)
 xcompmgr_LDADD = $(XCOMPMGR_LIBS) -lm
 
 EXTRA_DIST = \
