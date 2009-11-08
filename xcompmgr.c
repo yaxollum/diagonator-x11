@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * Copyright © 2003 Keith Packard
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
@@ -27,6 +25,9 @@
    says above. Not that I can really do anything about it
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -1854,7 +1855,7 @@ ev_window (XEvent *ev)
 static void
 usage (char *program)
 {
-    fprintf (stderr, "%s v1.1.4\n", program);
+    fprintf (stderr, "%s v%s\n", program, PACKAGE_VERSION);
     fprintf (stderr, "usage: %s [options]\n", program);
     fprintf (stderr, "Options\n");
     fprintf (stderr, "   -d display\n      Specifies which display should be managed.\n");
