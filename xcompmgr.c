@@ -159,7 +159,8 @@ static conv		*gaussianMap;
 #define TRANS_OPACITY	0.75
 
 #define DEBUG_REPAINT 0
-#define DEBUG_EVENTS 0
+#define DEBUG_EVENTS  0
+#define DEBUG_SHAPE   0
 #define MONITOR_REPAINT 0
 
 #define SHADOWS		1
@@ -1758,6 +1759,7 @@ damage_win (Display *dpy, XDamageNotifyEvent *de)
 	repair_win (dpy, w);
 }
 
+#if DEBUG_SHAPE
 static const char *
 shape_kind(int kind)
 {
@@ -1775,6 +1777,7 @@ shape_kind(int kind)
     return buf;
   }
 }
+#endif
 
 static void
 shape_win (Display *dpy, XShapeEvent *se)
@@ -1789,7 +1792,7 @@ shape_win (Display *dpy, XShapeEvent *se)
       XserverRegion region0;
       XserverRegion region1;
 
-#if 0
+#if DEBUG_SHAPE
       printf("win 0x%lx %s:%s %ux%u+%d+%d\n",
 	     (unsigned long) se->window,
 	     shape_kind(se->kind),
