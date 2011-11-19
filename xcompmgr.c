@@ -110,7 +110,6 @@ typedef struct _fade {
 
 static win		*list;
 static fade		*fades;
-static Display		*dpy;
 static int		scr;
 static Window		root;
 static Picture		rootPicture;
@@ -1981,7 +1980,7 @@ usage (char *program)
 }
 
 static Bool
-register_cm (void)
+register_cm (Display *dpy)
 {
     Window w;
     Atom a;
@@ -2034,6 +2033,7 @@ register_cm (void)
 int
 main (int argc, char **argv)
 {
+    Display	   *dpy;
     XEvent	    ev;
     Window	    root_return, parent_return;
     Window	    *children;
@@ -2157,7 +2157,7 @@ main (int argc, char **argv)
 	exit (1);
     }
 
-    if (!register_cm())
+    if (!register_cm(dpy))
     {
 	exit (1);
     }
