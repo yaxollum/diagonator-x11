@@ -4,7 +4,7 @@
 # Initialize Autoconf
 AC_PREREQ(2.60)
 AC_INIT([xcompmgr], [1.1.7],
-        [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg])
+        [https://gitlab.freedesktop.org/xorg/app/xcompmgr/issues])
 AC_CONFIG_SRCDIR([xcompmgr.c])
 AC_CONFIG_HEADERS([config.h])
 
