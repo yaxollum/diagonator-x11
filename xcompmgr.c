@@ -1550,7 +1550,7 @@ static void damage_win(Display *dpy, XDamageNotifyEvent *de) {
   }
   if (w->usable)
 #endif
-    repair_win(dpy, w);
+    repair_win(dpy, w); // NOLINT(readability-misleading-indentation)
 }
 
 #if DEBUG_SHAPE
