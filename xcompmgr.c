@@ -1963,7 +1963,7 @@ ev_window (XEvent *ev)
 static void
 usage (const char *program)
 {
-    fprintf (stderr, "%s v%s\n", program, PACKAGE_VERSION);
+    fprintf (stderr, "%s\n", program);
     fprintf (stderr, "usage: %s [options]\n%s\n", program,
     "Options:\n"
     "   -d display\n"
