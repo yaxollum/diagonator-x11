@@ -1,19 +1,30 @@
-xcompmgr is a sample compositing manager for X servers supporting the
-XFIXES, DAMAGE, RENDER, and COMPOSITE extensions.  It enables basic
-eye-candy effects.
+diagonator is an X11 compositor that draws diagonal lines across your screen to make you take a break from your computer.
 
-All questions regarding this software should be directed at the
-Xorg mailing list:
+It is a fork of [xcompmgr](https://gitlab.freedesktop.org/xorg/app/xcompmgr), so it supports all of the special effects that xcompmgr can do.
 
-  https://lists.x.org/mailman/listinfo/xorg
+## Build instructions
 
-The master development code repository can be found at:
+### Dependencies
+diagonator depends on libX11, Xfixes, Xdamage, Xcomposite, Xrender, and Xext. These libraries might be included in your operating system's official repositories. For example, on Fedora, they can be installed with:
 
-  https://gitlab.freedesktop.org/xorg/app/xcompmgr
+```
+sudo dnf install libX11-devel libXfixes-devel libXdamage-devel libXcomposite-devel libXrender-devel libXext-devel
+```
 
-Please submit bug reports and requests to merge patches there.
+### Building
+With the dependencies installed, diagonator can be built with:
+```
+make
+```
+This will produce an executable binary called `diagonator` in the same directory.
 
-For patch submission instructions, see:
+## Usage
 
-  https://www.x.org/wiki/Development/Documentation/SubmittingPatches
-
+To run diagonator with its default options, use
+```
+./diagonator
+```
+To view a list of supported options, run
+```
+./diagonator -h
+```
