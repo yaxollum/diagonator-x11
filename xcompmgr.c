@@ -1740,11 +1740,13 @@ static Window ev_window(XEvent *ev) {
 }
 #endif
 
-static void usage(const char *program) {
+static void usage(const char *program, int exit_code) {
   fprintf(stderr, "%s\n", program);
   fprintf(
       stderr, "usage: %s [options]\n%s\n", program,
       "Options:\n"
+      "   -h\n"
+      "      Display this help message.\n"
       "   -d display\n"
       "      Specifies which display should be managed.\n"
       "   -r radius\n"
@@ -1782,7 +1784,7 @@ static void usage(const char *program) {
       "      Draw server-side shadows with sharp edges.\n"
       "   -S\n"
       "      Enable synchronous operation (for debugging).\n");
-  exit(1);
+  exit(exit_code);
 }
 
 static Bool register_cm(Display *dpy) {
@@ -1859,8 +1861,10 @@ int main(int argc, char **argv) {
   char *display = NULL;
   int o;
 
-  while ((o = getopt(argc, argv, "D:I:O:d:r:o:l:t:scnfFCaS")) != -1) {
+  while ((o = getopt(argc, argv, "D:I:O:d:r:o:l:t:scnfFCaSh")) != -1) {
     switch (o) {
+    case 'h':
+      usage(argv[0], 0);
     case 'd':
       display = optarg;
       break;
@@ -1916,7 +1920,7 @@ int main(int argc, char **argv) {
       shadowOffsetY = atoi(optarg);
       break;
     default:
-      usage(argv[0]);
+      usage(argv[0], 1);
       break;
     }
   }
