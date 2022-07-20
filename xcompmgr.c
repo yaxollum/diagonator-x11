@@ -28,6 +28,7 @@
 #include "config.h"
 #endif
 
+#include "options.h"
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -1830,17 +1831,67 @@ static Bool register_cm(Display *dpy) {
   return True;
 }
 
-void draw_diagonals(Display *dpy, int scr, Window window) {
+void draw_diagonals(Display *dpy, Window window) {
+  XWindowAttributes attr;
+  XGetWindowAttributes(dpy, window, &attr);
+
+  int left = DIAGONATOR_LEFT_MARGIN;
+  int right = attr.width - DIAGONATOR_RIGHT_MARGIN;
+  int top = DIAGONATOR_TOP_MARGIN;
+  int bottom = attr.height - DIAGONATOR_BOTTOM_MARGIN;
+  int width = right - left;
+  int height = bottom - top;
+
   unsigned long mask = 0;
   XGCValues values;
-  values.foreground = XBlackPixel(dpy, scr);
+  values.foreground = XBlackPixelOfScreen(attr.screen);
   mask |= GCForeground;
-
-  values.line_width = 10;
+  values.line_style = DIAGONATOR_LINE_STYLE;
+  mask |= GCLineStyle;
+  values.line_width = DIAGONATOR_LINE_WIDTH;
   mask |= GCLineWidth;
 
   GC gc = XCreateGC(dpy, window, mask, &values);
-  XDrawLine(dpy, window, gc, 100, 100, 600, 600);
+
+  double theta = DIAGONATOR_LINE_DIRECTION * M_PI / 180.0;
+  double dist = sin(theta) * width + cos(theta) * height;
+  int line_count = dist / DIAGONATOR_LINE_SPACING;
+  XSegment lines[line_count];
+  double pixel_drift = cos(theta) * height;
+  for (int i = 0; i < line_count; ++i) {
+    double x1, y1, x2, y2;
+    if (pixel_drift >= 1.0) {
+      double left_y = i * DIAGONATOR_LINE_SPACING / cos(theta);
+      double bottom_x = (left_y - height) / tan(theta);
+      if (left_y <= height) {
+        x1 = 0;
+        y1 = left_y;
+      } else {
+        x1 = bottom_x;
+        y1 = height;
+      }
+      double top_x = left_y / tan(theta);
+      double right_y = (top_x - width) * tan(theta);
+      if (top_x <= width) {
+        x2 = top_x;
+        y2 = 0;
+      } else {
+        x2 = width;
+        y2 = right_y;
+      }
+    } else if (pixel_drift <= -1.0) {
+      x1 = x2 = y1 = y2 = 0;
+    } else {
+      x1 = x2 = i * DIAGONATOR_LINE_SPACING;
+      y1 = 0;
+      y2 = height;
+    }
+    lines[i].x1 = x1 + left;
+    lines[i].y1 = y1 + top;
+    lines[i].x2 = x2 + left;
+    lines[i].y2 = y2 + top;
+  }
+  XDrawSegments(dpy, window, gc, lines, line_count);
   XFreeGC(dpy, gc);
 }
 
@@ -2144,7 +2195,7 @@ int main(int argc, char **argv) {
       static int paint;
       paint_all(dpy, allDamage);
       paint++;
-      draw_diagonals(dpy, scr, overlay_window);
+      draw_diagonals(dpy, overlay_window);
       XSync(dpy, False);
       allDamage = None;
       clipChanged = False;
