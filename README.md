@@ -1,5 +1,7 @@
 diagonator is an X11 compositor that draws diagonal lines across your screen to make you take a break from your computer.
 
+![diagonator running on a Qtile desktop](screenshot.png)
+
 diagonator is a fork of [xcompmgr](https://gitlab.freedesktop.org/xorg/app/xcompmgr), so in addition to diagonal lines, it supports the same special effects as xcompmgr.
 
 ## Build instructions
