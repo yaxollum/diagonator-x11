@@ -1854,38 +1854,40 @@ void draw_diagonals(Display *dpy, Window window) {
   GC gc = XCreateGC(dpy, window, mask, &values);
 
   double theta = DIAGONATOR_LINE_DIRECTION * M_PI / 180.0;
-  double dist = sin(theta) * width + cos(theta) * height;
-  int line_count = dist / DIAGONATOR_LINE_SPACING;
+  double dist = sin(theta) * width + fabs(cos(theta)) * height;
+  int line_count = dist / DIAGONATOR_LINE_SPACING + 1;
   XSegment lines[line_count];
-  double pixel_drift = cos(theta) * height;
   for (int i = 0; i < line_count; ++i) {
     double x1, y1, x2, y2;
-    if (pixel_drift >= 1.0) {
-      double left_y = i * DIAGONATOR_LINE_SPACING / cos(theta);
-      double bottom_x = (left_y - height) / tan(theta);
-      if (left_y <= height) {
-        x1 = 0;
-        y1 = left_y;
-      } else {
-        x1 = bottom_x;
-        y1 = height;
-      }
-      double top_x = left_y / tan(theta);
-      double right_y = (top_x - width) * tan(theta);
-      if (top_x <= width) {
-        x2 = top_x;
-        y2 = 0;
-      } else {
-        x2 = width;
-        y2 = right_y;
-      }
-    } else if (pixel_drift <= -1.0) {
-      x1 = x2 = y1 = y2 = 0;
+
+    double left_y;
+    if (theta < M_PI / 2) {
+      left_y = i * DIAGONATOR_LINE_SPACING / cos(theta);
     } else {
-      x1 = x2 = i * DIAGONATOR_LINE_SPACING;
-      y1 = 0;
-      y2 = height;
+      left_y = height + i * DIAGONATOR_LINE_SPACING / cos(theta);
     }
+    if (left_y > height) {
+      x1 = (left_y - height) / tan(theta);
+      y1 = height;
+    } else if (left_y < 0) {
+      x1 = left_y / tan(theta);
+      y1 = 0;
+    } else {
+      x1 = 0;
+      y1 = left_y;
+    }
+    double right_y = left_y - width * tan(theta);
+    if (right_y < 0) {
+      x2 = width + right_y / tan(theta);
+      y2 = 0;
+    } else if (right_y > height) {
+      x2 = width + (right_y - height) / tan(theta);
+      y2 = height;
+    } else {
+      x2 = width;
+      y2 = right_y;
+    }
+
     lines[i].x1 = x1 + left;
     lines[i].y1 = y1 + top;
     lines[i].x2 = x2 + left;
