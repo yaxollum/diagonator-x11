@@ -37,3 +37,7 @@ To view a list of supported options, run
 ```
 ./diagonator -h
 ```
+
+### Diagonal line customization
+
+To customize the appearance of the diagonal lines, modify the values in the header file [`options.h`](options.h) and then rebuild the project.
