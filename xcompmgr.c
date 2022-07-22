@@ -1844,7 +1844,7 @@ void draw_diagonals(Display *dpy, Pixmap pixmap) {
 
   unsigned long mask = 0;
   XGCValues values;
-  values.foreground = XBlackPixel(dpy, DefaultScreen(dpy));
+  values.foreground = 0;
   mask |= GCForeground;
   values.line_style = DIAGONATOR_LINE_STYLE;
   mask |= GCLineStyle;
@@ -1852,7 +1852,7 @@ void draw_diagonals(Display *dpy, Pixmap pixmap) {
   mask |= GCLineWidth;
   GC gc = XCreateGC(dpy, pixmap, mask, &values);
   XFillRectangle(dpy, pixmap, gc, 0, 0, root_width, root_height);
-  XSetForeground(dpy, gc, XWhitePixel(dpy, DefaultScreen(dpy)));
+  XSetForeground(dpy, gc, 1);
   double theta = DIAGONATOR_LINE_DIRECTION * M_PI / 180.0;
   double dist = sin(theta) * width + fabs(cos(theta)) * height;
   int line_count = dist / DIAGONATOR_LINE_SPACING + 1;
@@ -2067,10 +2067,10 @@ int main(int argc, char **argv) {
   }
   XUngrabServer(dpy);
 
-  Pixmap overlay_pixmap = XCreatePixmap(dpy, root, root_width, root_height, 8);
+  Pixmap overlay_pixmap = XCreatePixmap(dpy, root, root_width, root_height, 1);
   draw_diagonals(dpy, overlay_pixmap);
   overlayPicture = XRenderCreatePicture(
-      dpy, overlay_pixmap, XRenderFindStandardFormat(dpy, PictStandardA8), 0,
+      dpy, overlay_pixmap, XRenderFindStandardFormat(dpy, PictStandardA1), 0,
       &pa);
   XFreePixmap(dpy, overlay_pixmap);
 
