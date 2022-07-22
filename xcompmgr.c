@@ -114,6 +114,7 @@ static int scr;
 static Window root;
 static Picture rootPicture;
 static Picture rootBuffer;
+static Picture overlayPicture;
 static Picture blackPicture;
 static Picture transBlackPicture;
 static Picture rootTile;
@@ -1007,6 +1008,8 @@ static void paint_all(Display *dpy, XserverRegion region) {
   XFixesDestroyRegion(dpy, region);
   if (rootBuffer != rootPicture) {
     XFixesSetPictureClipRegion(dpy, rootBuffer, 0, 0, None);
+    XRenderComposite(dpy, PictOpOver, overlayPicture, None, rootBuffer, 0, 0, 0,
+                     0, 0, 0, root_width, root_height);
     XRenderComposite(dpy, PictOpSrc, rootBuffer, None, rootPicture, 0, 0, 0, 0,
                      0, 0, root_width, root_height);
   }
@@ -1831,28 +1834,25 @@ static Bool register_cm(Display *dpy) {
   return True;
 }
 
-void draw_diagonals(Display *dpy, Window window) {
-  XWindowAttributes attr;
-  XGetWindowAttributes(dpy, window, &attr);
-
+void draw_diagonals(Display *dpy, Pixmap pixmap) {
   int left = DIAGONATOR_LEFT_MARGIN;
-  int right = attr.width - DIAGONATOR_RIGHT_MARGIN;
+  int right = root_width - DIAGONATOR_RIGHT_MARGIN;
   int top = DIAGONATOR_TOP_MARGIN;
-  int bottom = attr.height - DIAGONATOR_BOTTOM_MARGIN;
+  int bottom = root_height - DIAGONATOR_BOTTOM_MARGIN;
   int width = right - left;
   int height = bottom - top;
 
   unsigned long mask = 0;
   XGCValues values;
-  values.foreground = XBlackPixelOfScreen(attr.screen);
+  values.foreground = XBlackPixel(dpy, DefaultScreen(dpy));
   mask |= GCForeground;
   values.line_style = DIAGONATOR_LINE_STYLE;
   mask |= GCLineStyle;
   values.line_width = DIAGONATOR_LINE_WIDTH;
   mask |= GCLineWidth;
-
-  GC gc = XCreateGC(dpy, window, mask, &values);
-
+  GC gc = XCreateGC(dpy, pixmap, mask, &values);
+  XFillRectangle(dpy, pixmap, gc, 0, 0, root_width, root_height);
+  XSetForeground(dpy, gc, XWhitePixel(dpy, DefaultScreen(dpy)));
   double theta = DIAGONATOR_LINE_DIRECTION * M_PI / 180.0;
   double dist = sin(theta) * width + fabs(cos(theta)) * height;
   int line_count = dist / DIAGONATOR_LINE_SPACING + 1;
@@ -1893,7 +1893,7 @@ void draw_diagonals(Display *dpy, Window window) {
     lines[i].x2 = x2 + left;
     lines[i].y2 = y2 + top;
   }
-  XDrawSegments(dpy, window, gc, lines, line_count);
+  XDrawSegments(dpy, pixmap, gc, lines, line_count);
   XFreeGC(dpy, gc);
 }
 
@@ -1989,13 +1989,6 @@ int main(int argc, char **argv) {
   scr = DefaultScreen(dpy);
   root = RootWindow(dpy, scr);
 
-  Window overlay_window = XCompositeGetOverlayWindow(dpy, root);
-  // pass input through overlay window
-  XserverRegion overlay_region = XFixesCreateRegion(dpy, NULL, 0);
-  XFixesSetWindowShapeRegion(dpy, overlay_window, ShapeInput, 0, 0,
-                             overlay_region);
-  XFixesDestroyRegion(dpy, overlay_region);
-
   if (!XRenderQueryExtension(dpy, &render_event, &render_error)) {
     fprintf(stderr, "No render extension\n");
     exit(1);
@@ -2073,6 +2066,14 @@ int main(int argc, char **argv) {
     XFree(children);
   }
   XUngrabServer(dpy);
+
+  Pixmap overlay_pixmap = XCreatePixmap(dpy, root, root_width, root_height, 8);
+  draw_diagonals(dpy, overlay_pixmap);
+  overlayPicture = XRenderCreatePicture(
+      dpy, overlay_pixmap, XRenderFindStandardFormat(dpy, PictStandardA8), 0,
+      &pa);
+  XFreePixmap(dpy, overlay_pixmap);
+
   ufd.fd = ConnectionNumber(dpy);
   ufd.events = POLLIN;
   if (!autoRedirect)
@@ -2197,7 +2198,6 @@ int main(int argc, char **argv) {
       static int paint;
       paint_all(dpy, allDamage);
       paint++;
-      draw_diagonals(dpy, overlay_window);
       XSync(dpy, False);
       allDamage = None;
       clipChanged = False;
