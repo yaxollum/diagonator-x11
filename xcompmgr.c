@@ -1897,6 +1897,17 @@ void draw_diagonals(Display *dpy, Pixmap pixmap) {
   XFreeGC(dpy, gc);
 }
 
+typedef enum {
+  DiagonatorLineDirection,
+  DiagonatorLineWidth,
+  DiagonatorLineSpacing,
+  DiagonatorLineStyle,
+  DiagonatorTopMargin,
+  DiagonatorBottomMargin,
+  DiagonatorLeftMargin,
+  DiagonatorRightMargin
+} DiagonatorOption;
+
 int main(int argc, char **argv) {
   Display *dpy;
   XEvent ev;
@@ -1914,8 +1925,56 @@ int main(int argc, char **argv) {
   char *display = NULL;
   int o;
 
-  while ((o = getopt(argc, argv, "D:I:O:d:r:o:l:t:scnfFCaSh")) != -1) {
+  static int option_flag = 0;
+  static struct option long_options[] = {
+      {"line-direction", required_argument, &option_flag,
+       DiagonatorLineDirection},
+      {"line-width", required_argument, &option_flag, DiagonatorLineWidth},
+      {"line-spacing", required_argument, &option_flag, DiagonatorLineSpacing},
+      {"line-style", required_argument, &option_flag, DiagonatorLineStyle},
+      {"top-margin", required_argument, &option_flag, DiagonatorTopMargin},
+      {"bottom-margin", required_argument, &option_flag,
+       DiagonatorBottomMargin},
+      {"left-margin", required_argument, &option_flag, DiagonatorLeftMargin},
+      {"right-margin", required_argument, &option_flag, DiagonatorRightMargin},
+      {"help", no_argument, NULL, 'h'},
+      {0, 0, 0, 0}};
+  int option_index = 0;
+  while ((o = getopt_long(argc, argv, "D:I:O:d:r:o:l:t:scnfFCaSh", long_options,
+                          &option_index)) != -1) {
     switch (o) {
+    case 0:
+      switch (option_flag) {
+      case DiagonatorLineDirection:
+        DIAGONATOR_LINE_DIRECTION = atof(optarg);
+        break;
+      case DiagonatorLineWidth:
+        DIAGONATOR_LINE_WIDTH = atoi(optarg);
+        break;
+      case DiagonatorLineSpacing:
+        DIAGONATOR_LINE_SPACING = atof(optarg);
+        break;
+      case DiagonatorLineStyle:
+        DIAGONATOR_LINE_STYLE = atoi(optarg);
+        break;
+      case DiagonatorTopMargin:
+        DIAGONATOR_TOP_MARGIN = atoi(optarg);
+        break;
+      case DiagonatorBottomMargin:
+        DIAGONATOR_BOTTOM_MARGIN = atoi(optarg);
+        break;
+      case DiagonatorLeftMargin:
+        DIAGONATOR_LEFT_MARGIN = atoi(optarg);
+        break;
+      case DiagonatorRightMargin:
+        DIAGONATOR_RIGHT_MARGIN = atoi(optarg);
+        break;
+      default:
+        fprintf(stderr, "Unknown option flag %d\n", option_flag);
+        exit(1);
+        break;
+      }
+      break;
     case 'h':
       usage(argv[0], 0);
     case 'd':
