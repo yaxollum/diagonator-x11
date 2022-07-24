@@ -32,12 +32,32 @@ To run diagonator with its default options, use
 ./diagonator
 ```
 
-To view a list of supported options, run
+### Options
+
+To view a full list of supported options (options unique to diagonator as well as options that come with xcompmgr), run
 
 ```
 ./diagonator -h
 ```
 
-### Diagonal line customization
+There are multiple options for customizing the appearance of the diagonal lines:
 
-To customize the appearance of the diagonal lines, modify the values in the header file [`options.h`](options.h) and then rebuild the project.
+```
+--line-direction degrees
+    Direction of the lines, counterclockwise from the bottom of the screen.
+--line-width pixels
+    Width of the lines.
+--line-spacing pixels
+    Spacing between the lines.
+--line-style style
+    Style of the lines, as an integer. (0 = LineSolid, 1 = LineOnOffDash, 2 = LineDoubleDash)
+```
+
+Additionally, you can configure the margins to make diagonator draw in a custom rectangular area instead of your entire screen (this could be useful if you don't want diagonator to draw over your status bar):
+
+```
+--top-margin pixels
+--bottom-margin pixels
+--left-margin pixels
+--right-margin pixels
+```
