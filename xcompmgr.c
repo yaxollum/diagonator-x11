@@ -1745,11 +1745,27 @@ static Window ev_window(XEvent *ev) {
 #endif
 
 static void usage(const char *program, int exit_code) {
-  fprintf(stderr, "%s\n", program);
   fprintf(
-      stderr, "usage: %s [options]\n%s\n", program,
-      "Options:\n"
-      "   -h\n"
+      stderr, "usage: %s [options]\n\n%s\n", program,
+      "Options for customizing the diagonal lines:\n"
+      "   --line-direction degrees\n"
+      "      Direction of the lines, counterclockwise from the bottom of the "
+      "screen.\n"
+      "   --line-width pixels\n"
+      "      Width of the lines.\n"
+      "   --line-spacing pixels\n"
+      "      Spacing between the lines.\n"
+      "   --line-style style\n"
+      "      Style of the lines, as an integer. (0 = LineSolid, 1 = "
+      "LineOnOffDash, 2 = LineDoubleDash)\n\n"
+      "Configure the margins to make diagonator draw in a custom rectangular "
+      "area instead of your entire screen:\n"
+      "   --top-margin pixels\n"
+      "   --bottom-margin pixels\n"
+      "   --left-margin pixels\n"
+      "   --right-margin pixels\n\n"
+      "Other options:\n"
+      "   -h or --help\n"
       "      Display this help message.\n"
       "   -d display\n"
       "      Specifies which display should be managed.\n"
