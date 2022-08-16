@@ -2,7 +2,7 @@ diagonator is an X11 compositor that draws diagonal lines across your screen to 
 
 ![diagonator running on a Qtile desktop](screenshot.png)
 
-diagonator is a fork of [xcompmgr](https://gitlab.freedesktop.org/xorg/app/xcompmgr), so in addition to diagonal lines, it supports the same special effects as xcompmgr.
+You can use [diagonator-server](https://github.com/yaxollum/diagonator-server) to control diagonator. diagonator-server uses a break timer, a daily routine list, and a list of locked time ranges to give you a powerful, customizable setup.
 
 ## Build instructions
 
@@ -33,6 +33,8 @@ To run diagonator with its default options, use
 ```
 
 ### Options
+
+diagonator is a fork of [xcompmgr](https://gitlab.freedesktop.org/xorg/app/xcompmgr), so in addition to diagonal lines, it supports the same special effects as xcompmgr.
 
 To view a full list of supported options (options unique to diagonator as well as options that come with xcompmgr), run
 
